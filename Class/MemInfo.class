@@ -1,0 +1,42 @@
+Option Explicit
+Class MemInfo
+
+	Private totalMem_
+
+	Public Sub Class_Initialize()
+	
+		Call setMemStatus()
+	
+	End Sub
+
+	Private Sub setMemStatus()
+	
+		Dim oLocator
+		Dim oService
+		Dim mems
+
+		Set oLocator  = WScript.CreateObject("WbemScripting.SWbemLocator")
+		Set oService  = oLocator.ConnectServer
+		Set mems = oService.ExecQuery("Select * From Win32_ComputerSystem")
+		
+		Dim oneOfMems
+		For Each oneOfMems In mems
+			totalMem_ = oneOfMems.TotalPhysicalMemory / 1048574
+		Next
+	
+	End Sub
+	
+	Public Sub display()
+	
+		WScript.echo ""
+		WScript.echo "********************************************************************"
+		WScript.echo "* Memory                                                           *"
+		WScript.echo "********************************************************************"	
+		WScript.echo ""	
+		WScript.echo "ëçóeó ÅF" & totalMem_ & "MB"
+		WScript.echo ""
+	
+	End Sub
+
+End Class
+		

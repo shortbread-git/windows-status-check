@@ -1,0 +1,59 @@
+Option Explicit
+Class CpuInfo
+
+	Private type_
+	Private name_
+	Private manufacture_
+	Private clocksNow_
+	Private clocksMax_
+	Private l2CacheSize_
+	
+	Public Sub Class_Initialize()
+
+		Call setCpuStatus()
+
+	End Sub
+
+	Private Sub setCpuStatus()
+	
+		Dim oneOfCpusSet
+		Dim oLocator
+		Dim oService
+		Dim cpus
+
+		Set oLocator  = WScript.CreateObject("WbemScripting.SWbemLocator")
+		Set oService  = oLocator.ConnectServer
+		Set cpus      = oService.ExecQuery("Select * From Win32_Processor")
+		
+		Dim oneOfCpus
+		For Each oneOfCpus In cpus
+
+			type_        = oneOfCpus.Description
+			name_        = oneOfCpus.Name
+			manufacture_ = oneOfCpus.Manufacturer
+			clocksNow_   = CStr(oneOfCpus.CurrentClockSpeed)
+			clocksMax_   = CStr(oneOfCpus.MaxClockSpeed)
+			l2CacheSize_ = CStr(oneOfCpus.L2CacheSize)
+		
+		Next
+	
+	End Sub
+	
+	Public Sub display()
+	
+		WScript.echo "********************************************************************"
+		WScript.echo "* CPU                                                              *"
+		WScript.echo "********************************************************************"		
+		WScript.echo ""
+		WScript.echo "種類　　　　　：" & type_
+		WScript.echo "名前　　　　　：" & name_
+		WScript.echo "製造元　　　　：" & manufacture_
+		WScript.echo "現クロック数　：" & clocksNow_
+		WScript.echo "最大クロック数：" & clocksMax_
+		WScript.echo "L2キャッシュ　：" & l2CacheSize_
+		WScript.echo ""
+		
+	End Sub
+
+End Class
+		

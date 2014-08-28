@@ -1,0 +1,83 @@
+Option Explicit
+Class NetworkInfo
+
+	Private networkDict_
+
+	Public Sub Class_Initialize()
+	
+		Call setNetworkStatus()
+	
+	End Sub
+
+	Private Sub setNetworkStatus()
+	
+		Dim oLocator
+		Dim oService
+		Dim networkAdapts
+		Dim networkAdapters
+
+		Set oLocator       = WScript.CreateObject("WbemScripting.SWbemLocator")
+		Set oService       = oLocator.ConnectServer
+		Set networkAdapters = oService.ExecQuery("Select * From Win32_NetworkAdapter Where NetConnectionID IS NOT NULL")
+
+		Dim oneOfAdapter
+		Dim count 
+		Set networkDict_ = CreateObject("Scripting.Dictionary")
+		
+		count = 0
+		For Each oneOfAdapter In networkAdapters
+
+			Dim tmpDict
+			Set tmpDict = CreateObject("Scripting.Dictionary")
+			tmpDict.Add "conId"      ,oneOfAdapter.NetConnectionID
+			tmpDict.Add "adapterName",oneOfAdapter.Name
+			tmpDict.Add "mac"        ,oneOfAdapter.MACAddress
+			
+			Dim adapterId 
+			adapterId = "adapter" & count
+			networkDict_.Add adapterId , tmpDict
+			
+			count = count + 1
+		
+		Next
+
+	End Sub
+	
+	Public Sub display()
+	
+		WScript.echo "********************************************************************"
+		WScript.echo "* Networks                                                         *"
+		WScript.echo "********************************************************************"		
+		WScript.echo ""
+		
+		Dim adapterInfo
+		Dim count
+		networkDict_.Keys
+		count = 0
+		For Each adapterInfo In networkDict_
+			
+			Dim adapterId
+			Dim conId
+			Dim adapterName
+			Dim mac
+			
+			adapterId = "adapter" & count
+			
+			conId       = networkDict_.Item(adapterId).Item("conId")
+			adapterName = networkDict_.Item(adapterId).Item("adapterName")
+			mac         = networkDict_.Item(adapterId).Item("mac")
+			
+			If IsNull(mac) then
+				mac = ""
+			End If
+			
+			WScript.echo "接続名　　 ： " & conId
+			WScript.echo "アダプタ名 ： " & adapterName
+			WScript.echo "Macアドレス： " & mac
+			WScript.echo ""
+			
+			count = count + 1
+		
+		Next
+	End Sub
+End Class
