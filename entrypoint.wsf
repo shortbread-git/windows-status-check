@@ -17,5 +17,10 @@
 		Set network = New NetworkInfo
 		network.display
 
+
+		Dim strInp
+		WScript.Echo "‰½‚©ƒL[‚ğ‰Ÿ‚·‚ÆI—¹‚µ‚Ü‚·"
+		strInp = WScript.StdIn.ReadLine
+
 	</script>
 </job>
