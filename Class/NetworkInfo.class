@@ -27,6 +27,7 @@ Class NetworkInfo
 		
 		Set adapterDict = createAdapterDict(networkAdapters)
 		Set configDict  = createConfigDict(networkConfigs)
+		Set networkDict_ = CreateObject("Scripting.Dictionary")
 		
 		Call createNetworkDict(adapterDict,configDict)
 		
@@ -41,9 +42,8 @@ Class NetworkInfo
 		
 		Dim adapterInfo
 		Dim count
-		adapterDict_.Keys
-
-		For Each networkId In networkDict 
+		Dim networkId
+		For Each networkId In networkDict_
 			
 			Dim conId
 			Dim adapterName
@@ -51,6 +51,7 @@ Class NetworkInfo
 			Dim ip
 			Dim subnet
 			Dim dhcp
+			Dim status
 			
 			conId       = networkDict_.Item(networkId).Item("conId")
 			adapterName = networkDict_.Item(networkId).Item("adapterName")
@@ -58,6 +59,7 @@ Class NetworkInfo
 			ip          = networkDict_.Item(networkId).Item("ip")
 			subnet	    = networkDict_.Item(networkId).Item("subnet")
 			dhcp        = networkDict_.Item(networkId).Item("dhcp")
+			status      = networkDict_.Item(networkId).Item("status")
 			
 			WScript.echo "接続名　　 ： " & conId
 			WScript.echo "アダプタ名 ： " & adapterName
@@ -65,6 +67,7 @@ Class NetworkInfo
 			WScript.echo "IPアドレス ： " & ip
 			WScript.echo "SubnetMask ： " & subnet
 			WScript.echo "DHCP　　　 ： " & dhcp
+			WScript.echo "Status　　 ： " & status
 			WScript.echo ""
 		
 		Next
@@ -84,16 +87,16 @@ Class NetworkInfo
 			Dim tmpDict
 			Dim mac
 			Set tmpDict = CreateObject("Scripting.Dictionary")
-			
-			tmpDict.Add "conId"       , oneOfAdapter.NetConnectionID
-			tmpDict.Add "adapterName" , oneOfAdapter.Name
-			
+
 			mac = oneOfAdapter.MACAddress
 			If IsNull(mac) then
 				mac = ""
 			End If
-			
-			tmpDict.Add "mac" , mac
+		
+			tmpDict.Add "conId"       , oneOfAdapter.NetConnectionID
+			tmpDict.Add "adapterName" , oneOfAdapter.Name	
+			tmpDict.Add "mac"         , mac
+			tmpDict.Add "status"      , convertStatusMsg(oneOfAdapter.NetConnectionStatus)
 			
 			Dim adapterId 
 			adapterId = "adapter" & count
@@ -145,43 +148,84 @@ Class NetworkInfo
 	
 	
 	Private Sub createNetworkDict(adapterDict,configDict)
-		
+				
 		Dim count
 		Dim oneOfAdapter
+		
 		count = 0
 		For Each oneOfAdapter In adapterDict
 			
 			Dim tmpDict
 			Dim a_adapterName
+			Dim oneOfConfig
+			
+			a_adapterName     = adapterDict.Item(oneOfAdapter).Item("adapterName")
 			Set tmpDict       = CreateObject("Scripting.Dictionary")
-			a_adapterName     = adapterDict.Item("oneOfAdapter").Item("adapterName")
 			
 			For Each oneOfConfig In configDict
-			
+				
 				Dim c_adapterName
-				c_adapterName = adapterDict.Item("oneOfConfig").Item("adapterName")
-				If StrComp(a_adapterName , c_adapterName) Then
-				
-					tmpDict.Add "conId"       , adapterDict.Item("oneOfAdapter").Item("conId")
-					tmpDict.Add "adapterName" , a_adapterName
-					tmpDict.Add "mac"         , adapterDict.Item("oneOfAdapter").Item("mac")
-					tmpDict.Add "ip"          , adapterDict.Item("oneOfConfig").Item("ip")
-					tmpDict.Add "subnet"      , adapterDict.Item("oneOfConfig").Item("subnet")
-					tmpDict.Add "dhcp"        , adapterDict.Item("oneOfConfig").Item("dhcp")
-				
+				c_adapterName = configDict.Item(oneOfConfig).Item("adapterName")
+									
+				If StrComp(a_adapterName , c_adapterName) = 0 Then
+					If Not(tmpDict.Exists("conId")) Then
+						tmpDict.Add "conId"       , adapterDict.Item(oneOfAdapter).Item("conId")
+						tmpDict.Add "adapterName" , a_adapterName
+						tmpDict.Add "mac"         , adapterDict.Item(oneOfAdapter).Item("mac")
+						tmpDict.Add "ip"          , configDict.Item(oneOfConfig).Item("ip")
+						tmpDict.Add "subnet"      , configDict.Item(oneOfConfig).Item("subnet")
+						tmpDict.Add "dhcp"        , configDict.Item(oneOfConfig).Item("dhcp")
+						tmpDict.Add "status"      , adapterDict.Item(oneOfAdapter).Item("status")
+						
+						Dim networkId
+						networkId = "network" & count
+						networkDict_.Add networkId , tmpDict
+					End If
 				End If
-			
 			Next
 			
-			Dim networkId
-			networkId = "network" & count
-			networkDict_.Add networkId , tmpDict  
 			count = count + 1
 			
 		Next
 	End Sub
 	
+	Private Function convertStatusMsg(statusNum)
+	
+		Dim statusMessage
+		
+		Select Case statusNum
+			Case 0
+				statusMessage = "リンクダウン"
+			Case 1
+				statusMessage = "接続中..."
+			Case 2
+				statusMessage = "リンクアップ"
+			Case 3
+				statusMessage = "接続中..."
+			Case 4
+				statusMessage = "ハードウェアがありません"
+			Case 5
+				statusMessage = "無効"
+			Case 6
+				statusMessage = "ハードウェアが正常に機能していません"
+			Case 7
+				statusMessage = "メディアが切断状態です"
+			Case 8
+				statusMessage = "認証中..."
+			Case 9
+				statusMessage = "認証に成功しました"
+			Case 10
+				statusMessage = "認証に失敗しました"
+			Case 11
+				statusMessage = "アドレスが無効"
+			Case 12
+				statusMessage = "資格情報が必要"
+			Case Else
+				statusMessage = "不明なエラー。Win32エラーコードを参照してください"
+		End Select
+		
+		convertStatusMsg = statusmessage
+	
+	End Function
+	
 End Class
-
-Dim test
-Set test = New NetworkInfo
