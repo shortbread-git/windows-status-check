@@ -28,6 +28,10 @@ Class NetworkInfo
 		Set adapterDict = createAdapterDict(networkAdapters)
 		Set configDict  = createConfigDict(networkConfigs)
 		
+		WScript.echo adapterDict.count
+		WScript.echo configDict.count
+		
+		
 		Call createNetworkDict(adapterDict,configDict)
 		
 	End Sub
@@ -182,6 +186,7 @@ Class NetworkInfo
 	End Sub
 	
 End Class
+
 
 Dim test
 Set test = New NetworkInfo
