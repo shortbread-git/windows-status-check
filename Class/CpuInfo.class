@@ -4,9 +4,13 @@ Class CpuInfo
 	Private type_
 	Private name_
 	Private manufacture_
+	Private coreNum_
+	Private logicalProcessorNum_
 	Private clocksNow_
 	Private clocksMax_
 	Private l2CacheSize_
+	Private l3CacheSize_
+	
 	
 	Public Sub Class_Initialize()
 
@@ -28,12 +32,15 @@ Class CpuInfo
 		Dim oneOfCpus
 		For Each oneOfCpus In cpus
 
-			type_        = oneOfCpus.Description
-			name_        = oneOfCpus.Name
-			manufacture_ = oneOfCpus.Manufacturer
-			clocksNow_   = CStr(oneOfCpus.CurrentClockSpeed)
-			clocksMax_   = CStr(oneOfCpus.MaxClockSpeed)
-			l2CacheSize_ = CStr(oneOfCpus.L2CacheSize)
+			type_                = oneOfCpus.Description
+			name_                = oneOfCpus.Name
+			manufacture_         = oneOfCpus.Manufacturer
+			coreNum_             = oneOfCpus.NumberOfCores
+			logicalProcessorNum_ = oneOfCpus.NumberOfLogicalProcessors
+			clocksNow_           = CStr(oneOfCpus.CurrentClockSpeed)
+			clocksMax_           = CStr(oneOfCpus.MaxClockSpeed)
+			l2CacheSize_         = CStr(oneOfCpus.L2CacheSize)
+			l3CacheSize_         = CStr(oneOfCpus.L3CacheSize)
 		
 		Next
 	
@@ -45,12 +52,15 @@ Class CpuInfo
 		WScript.echo "* CPU                                                              *"
 		WScript.echo "********************************************************************"		
 		WScript.echo ""
-		WScript.echo "種類　　　　　：" & type_
-		WScript.echo "名前　　　　　：" & name_
-		WScript.echo "製造元　　　　：" & manufacture_
-		WScript.echo "現クロック数　：" & clocksNow_
-		WScript.echo "最大クロック数：" & clocksMax_
-		WScript.echo "L2キャッシュ　：" & l2CacheSize_
+		WScript.echo "種類　　　　　　：" & type_
+		WScript.echo "名前　　　　　　：" & name_
+		WScript.echo "製造元　　　　　：" & manufacture_
+		WScript.echo "コア数　　　　　：" & coreNum_
+		WScript.echo "論理プロセッサ数：" & logicalProcessorNum_
+		WScript.echo "現クロック数　　：" & clocksNow_
+		WScript.echo "最大クロック数　：" & clocksMax_
+		WScript.echo "L2キャッシュ　　：" & l2CacheSize_
+		WScript.echo "L3キャッシュ　　：" & l3CacheSize_
 		WScript.echo ""
 		
 	End Sub

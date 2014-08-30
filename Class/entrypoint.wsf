@@ -1,10 +1,11 @@
 <job id="GetEnvironmentalInformation">
-	<script language="vbscript" src="Class/CpuInfo.class"></script>
-	<script language="vbscript" src="Class/MemInfo.class"></script>
-	<script language="vbscript" src="Class/NetworkInfo.class"></script>
+	<script language="vbscript" src="CpuInfo.class"></script>
+	<script language="vbscript" src="MemInfo.class"></script>
+	<script language="vbscript" src="NetworkInfo.class"></script>
+	<script language="vbscript" src="BasicInfo.class"></script>
 	
 	<script language="vbscript">
-		
+			
 		Dim cpu
 		Set cpu = New CpuInfo
 		cpu.display		
@@ -12,6 +13,10 @@
 		Dim mem
 		Set mem = New MemInfo
 		mem.display
+
+		Dim basic
+		Set basic = New BasicInfo
+		basic.display
 		
 		Dim network
 		Set network = New NetworkInfo

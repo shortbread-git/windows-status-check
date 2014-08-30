@@ -1,0 +1,96 @@
+Option Explicit
+Class BasicInfo
+	
+	Private hostname_
+	Private domain_
+	Private manufacturer_
+	Private partOfDomain_
+	Private servicePac_
+	Private model_
+	Private locale_
+	Private elapsedTime_
+	Private powerStatus_
+	Private workgroup_
+	Private architecture_
+	Private language_
+	
+	Public Sub Class_Initialize()
+
+		Call setBasicStatus()
+
+	End Sub
+
+	Private Sub setBasicStatus()
+	
+		Dim oLocator
+		Dim oService
+		Dim basics
+		Dim hostname
+		Dim oses
+
+		Set oLocator = WScript.CreateObject("WbemScripting.SWbemLocator")
+		Set oService = oLocator.ConnectServer
+		Set basics   = oService.ExecQuery("Select * From Win32_ComputerSystem")
+		Set oses     = oService.ExecQuery("Select * From Win32_OperatingSystem")
+		
+		Call setComputerSystem(basics)
+		Call setOperatingSystem(oses)
+		
+	End Sub
+	
+	Private Sub setComputerSystem(basics)
+
+		Dim oneOfBasic
+			
+		For Each oneOfBasic In basics 
+			
+			hostname_     = oneOfBasic.DNSHostName
+			domain_       = oneOfBasic.Domain
+			manufacturer_ = oneOfBasic.Manufacturer
+			partOfDomain_ = oneOfBasic.PartOfDomain
+			model_        = oneOfBasic.Model
+			powerStatus_  = oneOfBasic.PowerState
+			workgroup_    = oneOfBasic.Workgroup
+			
+		Next
+	
+	End Sub 
+	
+	Private Sub setOperatingSystem(oses)
+	
+		Dim oneOfOs
+	
+		For Each oneOfOs In oses 
+			
+			servicePac_   = oneOfOs.CSDVersion
+			elapsedTime_  = oneOfOs.LastBootUpTime
+			language_     = oneOfOs.OSLanguage
+			architecture_ = CStr(oneOfOs.OSArchitecture)
+			
+		Next
+	
+	End Sub
+	
+	Public Sub display()
+	
+		WScript.echo "********************************************************************"
+		WScript.echo "* Basic Info                                                       *"
+		WScript.echo "********************************************************************"		
+		WScript.echo ""
+		WScript.echo "モデル　　　　　　　：" & model_
+		WScript.echo "製造元　　　　　　　：" & manufacturer_
+		WScript.echo "起動ステータス　　　：" & powerStatus_
+		WSCript.echo "サービスパック　　　：" & servicePac_
+		WScript.echo "OS上での言語　　　　：" & language_
+		WScript.echo "bit数　　　　　　　 ：" & architecture_
+		WScript.echo "ホスト名　　　　　　：" & hostname_
+		WScript.echo "ワークグループ名　　：" & workgroup_
+		WScript.echo "ドメイン名　　　　　：" & domain_
+		WScript.echo "ロケール　　　　　　：" & locale_
+		WScript.echo "起動から経過した時間：" & elapsedTime_
+		WScript.echo ""
+		
+	End Sub
+
+End Class
+				
